@@ -1,3 +1,3 @@
 streamlit==1.23.1
 streamlit-chat==0.1.1  # Latest available version
-langchain==0.148.0     # Closest available version before 0.149.0
+langchain==0.0.28  # Closest available version before 0.149.0
