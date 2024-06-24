@@ -1,8 +1,8 @@
-streamlit==1.23.1
-streamlit-chat==0.1.1
-langchain==0.149.0  # Example version, replace with the version you confirmed is available and compatible
-pydantic==1.10.8    # Example version, replace with a compatible version
-llama-cpp-python==0.1.73
-faiss-cpu==1.7.3
-sentence-transformers==2.2.2
+streamlit
+streamlit-chat
+langchain  # Example version, replace with the version you confirmed is available and compatible
+pydantic   # Example version, replace with a compatible version
+llama-cpp-python
+faiss-cpu
+sentence-transformers
 
