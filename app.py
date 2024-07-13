@@ -11,20 +11,20 @@ import os
 import tempfile
 
 
-
-
 def initialize_session_state():
     if 'history' not in st.session_state:
         st.session_state['history'] = []
 
     if 'generated' not in st.session_state:
-        st.session_state['generated'] = ["Hello! Ask me anything about 🤗"]
+        st.session_state["generated"] = ["Hello! Ask me anything about the document 🤗"]
 
     if 'past' not in st.session_state:
         st.session_state['past'] = ["Hey! 👋"]
 
 def conversation_chat(query, chain, history):
+    print("history", history)
     result = chain({"question": query, "chat_history": history})
+    print("response", result["answer"])
     history.append((query, result["answer"]))
     return result["answer"]
 
@@ -53,14 +53,14 @@ def display_chat_history(chain):
 def create_conversational_chain(vector_store):
     # Create llm
     llm = LlamaCpp(
-    streaming = True,
-    model_path="C:/Users/chint/Downloads/mistral-7b-instruct-v0.1.Q4_K_S.gguf",
-    temperature=0.75,
-    top_p=1, 
-    verbose=True,
-    n_ctx=4096
-)
-    
+        streaming=True,
+        model_path="Meta-Llama-3-8B-Instruct.Q8_0.gguf",
+        temperature=0.75,
+        top_p=1,
+        verbose=True,
+        n_ctx=4096,
+    )
+
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
     chain = ConversationalRetrievalChain.from_llm(llm=llm, chain_type='stuff',
@@ -71,11 +71,10 @@ def create_conversational_chain(vector_store):
 def main():
     # Initialize session state
     initialize_session_state()
-    st.title("Multi-PDF ChatBot using Mistral-7B-Instruct :books:")
+    st.title("Multi-PDF ChatBot using Llama-3-8B-Instruct :books:")
     # Initialize Streamlit
     st.sidebar.title("Document Processing")
     uploaded_files = st.sidebar.file_uploader("Upload files", accept_multiple_files=True)
-
 
     if uploaded_files:
         text = []
@@ -90,7 +89,12 @@ def main():
                 loader = PyPDFLoader(temp_file_path)
 
             if loader:
-                text.extend(loader.load())
+                parsed_content = loader.load()
+                text.extend(parsed_content)
+                print(f"Parsed content from {file.name}:")
+                for page in parsed_content:
+                    print(page.page_content)
+                    print("---")  # Separator between pages
                 os.remove(temp_file_path)
 
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=20)
@@ -106,7 +110,6 @@ def main():
         # Create the chain object
         chain = create_conversational_chain(vector_store)
 
-        
         display_chat_history(chain)
 
 if __name__ == "__main__":
